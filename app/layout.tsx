@@ -1,7 +1,6 @@
 import AuthWrapper from "@/components/_layout/authWrapper";
 import ModalProvider from "@/components/_layout/modalProvider";
 import QueryProvider from "@/components/_layout/queryProvider";
-import { getInitialAuthState } from "@/lib/utils/getInitialAuthState";
 import type { Metadata } from "next";
 import { Nanum_Myeongjo } from "next/font/google";
 import localFont from "next/font/local";
