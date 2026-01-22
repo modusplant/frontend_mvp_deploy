@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  /* Primary Colors (Green) */
+  --primary-10: #ebf5ea;
+  --primary-50: #3a972e;
+  --primary-70: #235c1c;
+
+  /* Neutral Colors (Grayscale) */
+  --neutral-0: #000000;
+  --neutral-10: #212121;
+  --neutral-20: #313131;
+  --neutral-40: #515151;
+  --neutral-50: #777777;
+  --neutral-60: #919191;
+  --neutral-70: #adadad;
+  --neutral-80: #c2c2c2;
+  --neutral-90: #e4e4e4;
+  --neutral-100: #ffffff;
+
+  /* Surface Colors (Backgrounds) */
+  --surface-98: #f3f4f5;
+  --surface-99: #f9f9fa;
+  --surface-stroke: #e9e9e9;
+  --surface-stroke-2: #dbdbdb;
+
+  /* System Colors */
+  --system-alert: #f44335;
+  --system-info: #3b82f6;
+
+  /* Font Variables */
+  --font-emphasis: var(--font-nanum-myeongjo);
+  --font-body: var(--font-pretendard);
+}
+
+@theme inline {
+  /* Primary Colors */
+  --color-primary-10: var(--primary-10);
+  --color-primary-50: var(--primary-50);
+  --color-primary-70: var(--primary-70);
+
+  /* Neutral Colors */
+  --color-neutral-0: var(--neutral-0);
+  --color-neutral-10: var(--neutral-10);
+  --color-neutral-20: var(--neutral-20);
+  --color-neutral-40: var(--neutral-40);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-60: var(--neutral-60);
+  --color-neutral-70: var(--neutral-70);
+  --color-neutral-80: var(--neutral-80);
+  --color-neutral-90: var(--neutral-90);
+  --color-neutral-100: var(--neutral-100);
+
+  /* Surface Colors */
+  --color-surface-98: var(--surface-98);
+  --color-surface-99: var(--surface-99);
+  --color-surface-stroke: var(--surface-stroke);
+  --color-surface-stroke-2: var(--surface-stroke-2);
+
+  /* System Colors */
+  --color-system-alert: var(--system-alert);
+  --color-system-info: var(--system-info);
+
+  /* Font Families */
+  --font-emphasis: var(--font-nanum-myeongjo);
+  --font-body: var(--font-pretendard);
+}
+
+body {
+  font-family:
+    var(--font-body),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: var(--neutral-0);
+  background-color: var(--neutral-100);
+}
