@@ -1,10 +1,12 @@
-import AuthWrapper from "@/components/_layout/authWrapper";
+import AuthGuard from "@/components/_layout/authGuard";
+import AuthInitializer from "@/components/_layout/authInitializer";
+import ConditionalLayout from "@/components/_layout/conditionalLayout";
 import ModalProvider from "@/components/_layout/modalProvider";
 import QueryProvider from "@/components/_layout/queryProvider";
+import { getInitialAuthState } from "@/lib/utils/getInitialAuthState";
 import type { Metadata } from "next";
 import { Nanum_Myeongjo } from "next/font/google";
 import localFont from "next/font/local";
-import { Suspense } from 'react';
 import "./globals.css";
 
 // Emphasis 폰트: Nanum Myeongjo (제목, 강조)
@@ -63,15 +65,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialUser = await getInitialAuthState();
+
   return (
     <html lang="ko">
       <body
         className={`${pretendard.className} ${nanumMyeongjo.variable} antialiased`}
       >
         <QueryProvider>
-          <Suspense fallback={<div></div>}>
-            <AuthWrapper>{children}</AuthWrapper>
-          </Suspense>
+          <AuthInitializer initialUser={initialUser} />
+          <ConditionalLayout initialUser={initialUser}>
+            <AuthGuard>{children}</AuthGuard>
+          </ConditionalLayout>
           <ModalProvider />
         </QueryProvider>
       </body>
