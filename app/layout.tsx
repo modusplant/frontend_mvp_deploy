@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import AuthGuard from "@/components/_layout/authGuard";
 import AuthInitializer from "@/components/_layout/authInitializer";
 import ConditionalLayout from "@/components/_layout/conditionalLayout";
