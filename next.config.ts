@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "kormap.ddnsfree.com",
+        hostname: process.env.BASE_HOSTNAME || "",
       },
     ],
   },
