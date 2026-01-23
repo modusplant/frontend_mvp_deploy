@@ -3,11 +3,14 @@
 import { usePathname } from "next/navigation";
 import Header from "./header";
 import Footer from "./footer";
+import { User } from "@/lib/types/auth";
 
 export default function ConditionalLayout({
   children,
+  initialUser,
 }: {
   children: React.ReactNode;
+  initialUser: User | null;
 }) {
   const pathname = usePathname();
 
@@ -21,7 +24,7 @@ export default function ConditionalLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <Header initialUser={initialUser} />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

@@ -37,7 +37,7 @@ export default function PrimaryCategoryFilter({
   };
 
   const isSelector = variant === "selector";
-  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
+  const selectedCategory = categories.find((c) => c.id == selectedCategoryId);
   const displayText = selectedCategory?.name ?? "주제를 선택해주세요(필수)";
 
   return (
@@ -59,7 +59,7 @@ export default function PrimaryCategoryFilter({
             "text-neutral-0 w-40 rounded-full px-4 py-3 text-sm font-medium":
               !isSelector,
             // selector 스타일 (게시글 작성)
-            "h-11 w-60 rounded-lg px-4.5 py-2.5": isSelector,
+            "h-11 w-full rounded-lg px-3 py-2.5 md:w-60 md:px-4.5": isSelector,
           }
         )}
         aria-haspopup="listbox"
@@ -90,7 +90,7 @@ export default function PrimaryCategoryFilter({
             "border-surface-stroke absolute z-50 mt-2 border bg-neutral-100 shadow-lg",
             {
               "rounded-lg p-1.5": !isSelector,
-              "top-12 left-0 w-60 rounded-lg": isSelector,
+              "top-12 left-0 w-full rounded-lg md:w-60": isSelector,
             }
           )}
           role="listbox"

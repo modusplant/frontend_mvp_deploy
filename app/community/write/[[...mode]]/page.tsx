@@ -10,7 +10,7 @@ import ContentEditor from "@/components/community/write/contentEditor";
 import PostWriteActions from "@/components/community/write/postWriteActions";
 import usePostWrite from "@/lib/hooks/community/usePostWrite";
 import { usePostWriteForm } from "@/lib/hooks/community/usePostWriteForm";
-import { postApi } from "@/lib/api/post";
+import { postApi } from "@/lib/api/client/post";
 
 export default function PostWritePage() {
   const params = useParams();
@@ -23,7 +23,7 @@ export default function PostWritePage() {
   // 수정 모드일 경우 기존 데이터 로드
   const { data: existingPost } = useQuery({
     queryKey: ["post", postId],
-    queryFn: () => postApi.getPostDetail(postId!),
+    queryFn: () => postApi.getEditPostDetail(postId!),
     enabled: isEditMode && !!postId,
   });
 
@@ -39,9 +39,8 @@ export default function PostWritePage() {
       .join("\n\n");
 
     return {
-      // TODO: API 응답에서 UUID를 가져와야 함
-      primaryCategoryId: post.primaryCategory, // API에서 ID로 제공되어야 함
-      secondaryCategoryId: post.secondaryCategory, // API에서 ID로 제공되어야 함
+      primaryCategoryId: post.primaryCategoryId,
+      secondaryCategoryId: post.secondaryCategoryId,
       title: post.title,
       textContent: textParts,
     };
@@ -83,7 +82,7 @@ export default function PostWritePage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-[848px] flex-col gap-5 bg-neutral-100 px-10 py-5">
+    <div className="mx-auto flex min-h-screen w-full max-w-full flex-col gap-5 bg-neutral-100 px-4 py-5 md:px-8 lg:w-[848px] lg:px-10">
       {/* 헤더 */}
       <PostWriteHeader isEditMode={hookIsEditMode} />
 
@@ -95,6 +94,7 @@ export default function PostWritePage() {
           secondaryCategoryId={secondaryCategoryId}
           onPrimaryCategoryChange={setPrimaryCategoryId}
           onSecondaryCategoryChange={setSecondaryCategoryId}
+          isEditMode={hookIsEditMode}
         />
 
         {/* 제목 입력 */}

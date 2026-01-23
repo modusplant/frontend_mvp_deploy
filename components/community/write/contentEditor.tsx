@@ -16,7 +16,7 @@ export default function ContentEditor({
   onImagesChange,
 }: ContentEditorProps) {
   return (
-    <div className="border-surface-stroke flex w-3xl flex-col self-stretch rounded-[10px] border">
+    <div className="border-surface-stroke flex w-full flex-col self-stretch rounded-[10px] border">
       {/* 본문 입력 영역 */}
       <div className="flex flex-1 flex-col gap-2.5 self-stretch p-5">
         <textarea

@@ -9,7 +9,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * - secondary: 보조 스타일 (회색 배경)
    * - deactivate: 비활성화 스타일 (회색 배경)
    */
-  variant?: "default" | "point" | "secondary" | "deactivate";
+  variant?: "default" | "point" | "point2" | "secondary" | "deactivate";
   /**
    * 버튼 크기
    */
@@ -39,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || variant === "deactivate"}
         className={cn(
           // 기본 스타일
-          "inline-flex items-center justify-center rounded-lg transition-colors",
+          "inline-flex items-center justify-center rounded-full transition-colors",
           "focus-visible:ring-primary-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
           "disabled:pointer-events-none disabled:opacity-50",
 
@@ -52,6 +52,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             // point: primary green 배경
             "bg-primary-50 hover:bg-primary-70 text-neutral-100":
               variant === "point",
+
+            // point2: primary green 테투리
+            "border-primary-50 text-primary-50 hover:bg-primary-10 border":
+              variant === "point2",
 
             // secondary: 회색 배경, 활성화 상태
             "bg-neutral-80 hover:bg-neutral-70 text-neutral-100":

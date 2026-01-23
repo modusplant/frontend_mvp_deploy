@@ -3,11 +3,17 @@
 :root {
   /* Primary Colors (Green) */
   --primary-10: #ebf5ea;
+  --primary-15: #d2eace;
+  --primary-20: #aed4a9;
+  --primary-30: #8dc386;
+  --primary-40: #5ba952;
   --primary-50: #3a972e;
+  --primary-60: #296a20;
   --primary-70: #235c1c;
 
   /* Neutral Colors (Grayscale) */
   --neutral-0: #000000;
+  --neutral-5: #111111;
   --neutral-10: #212121;
   --neutral-20: #313131;
   --neutral-40: #515151;
@@ -36,7 +42,12 @@
 @theme inline {
   /* Primary Colors */
   --color-primary-10: var(--primary-10);
+  --color-primary-15: var(--primary-15);
+  --color-primary-20: var(--primary-20);
+  --color-primary-30: var(--primary-30);
+  --color-primary-40: var(--primary-40);
   --color-primary-50: var(--primary-50);
+  --color-primary-60: var(--primary-60);
   --color-primary-70: var(--primary-70);
 
   /* Neutral Colors */

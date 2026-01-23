@@ -2,7 +2,7 @@
 
 interface PostWriteActionsProps {
   isSubmitting: boolean;
-  isFormValid: boolean;
+  isFormValid: boolean | "";
   onSubmit: () => void;
   isEditMode: boolean;
 }

@@ -8,6 +8,7 @@ interface CategorySelectorProps {
   secondaryCategoryId: string;
   onPrimaryCategoryChange: (categoryId: string) => void;
   onSecondaryCategoryChange: (categoryId: string) => void;
+  isEditMode?: boolean;
 }
 
 /**
@@ -20,6 +21,7 @@ export default function CategorySelector({
   secondaryCategoryId,
   onPrimaryCategoryChange,
   onSecondaryCategoryChange,
+  isEditMode = false,
 }: CategorySelectorProps) {
   const handlePrimaryChange = (categoryId: string) => {
     onPrimaryCategoryChange(categoryId);
@@ -32,7 +34,7 @@ export default function CategorySelector({
   };
 
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex flex-col gap-2.5 md:flex-row md:items-center">
       <PrimaryCategoryFilter
         selectedCategoryId={primaryCategoryId}
         onCategoryChange={handlePrimaryChange}
@@ -47,6 +49,7 @@ export default function CategorySelector({
         variant="selector"
         multiSelect={false}
         showAll={false}
+        disableAutoReset={isEditMode}
       />
     </div>
   );

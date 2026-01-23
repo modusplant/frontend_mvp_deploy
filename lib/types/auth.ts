@@ -5,7 +5,7 @@ import {
   FieldErrors,
   UseFormSetValue,
 } from "react-hook-form";
-import { SignupFormValues } from "@/lib/utils/auth";
+import { SignupFormValues } from "@/lib/constants/schema";
 
 /**
  * 로그인 요청 데이터
@@ -76,11 +76,12 @@ export interface UserAuthInfoResponseData {
  * 인증된 사용자 정보 타입
  */
 export interface User {
-  id: string;
-  uuid: string; // 사용자 UUID (게시글 작성자 비교용)
+  id: string; // UUID
   email: string;
   nickname: string;
-  roles: string;
+  role: string;
+  image: string | null;
+  introduction: string | null;
 }
 
 /**
@@ -154,34 +155,6 @@ export interface NicknameCheckResponse {
   available: boolean;
   message: string;
 }
-
-/**
- * 인증 상태 및 액션 타입 (Zustand 스토어용)
- */
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  loginAttempts: number;
-  accessToken: string | null;
-}
-
-/**
- * 인증 액션 타입
- */
-interface AuthActions {
-  initialize: () => Promise<void>;
-  login: (user: User, rememberMe: boolean) => void;
-  logout: () => void;
-  updateUser: (user: Partial<User>) => void;
-  incrementLoginAttempts: () => void;
-  resetLoginAttempts: () => void;
-  setAccessToken: (token: string | null) => void;
-}
-
-/**
- * 인증 스토어 타입
- */
-export type AuthStore = AuthState & AuthActions;
 
 /**
  * 이메일 섹션 컴포넌트 props 타입

@@ -2,11 +2,41 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { PostContent as PostContentType } from "@/lib/types/post";
+import { ContentPart } from "@/lib/types/post";
 import ImageModal from "./imageModal";
 
 interface PostContentProps {
-  content: PostContentType[];
+  content: ContentPart[];
+}
+
+// URL을 감지하고 링크로 변환하는 함수
+function parseTextWithLinks(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      try {
+        const url = new URL(part);
+        const displayText = url.hostname.replace(/^www\./, "");
+
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary-50 hover:text-primary-40 break-all underline decoration-1 underline-offset-2 transition-colors"
+          >
+            {displayText}
+          </a>
+        );
+      } catch {
+        return part;
+      }
+    }
+    return part;
+  });
 }
 
 export default function PostContent({ content }: PostContentProps) {
@@ -26,9 +56,9 @@ export default function PostContent({ content }: PostContentProps) {
             return (
               <p
                 key={`text-${index}`}
-                className="font-pretendard text-neutral-20 mb-4 text-lg leading-relaxed whitespace-pre-wrap"
+                className="text-neutral-20 mb-4 text-[16px] leading-relaxed break-words whitespace-pre-wrap"
               >
-                {item.data}
+                {parseTextWithLinks(item.data || "")}
               </p>
             );
           }
@@ -38,10 +68,10 @@ export default function PostContent({ content }: PostContentProps) {
               <div
                 key={`image-${index}`}
                 className="my-6 cursor-pointer"
-                onClick={() => setSelectedImage(item.data)}
+                onClick={() => setSelectedImage(item.src || null)}
               >
                 <Image
-                  src={`data:image/png;base64,${item.data}`}
+                  src={item.src || ""}
                   alt={item.filename || `이미지 ${index + 1}`}
                   width={800}
                   height={600}

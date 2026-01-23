@@ -11,7 +11,7 @@ export default function LoginPage() {
         <div className="mb-8 flex flex-col items-center gap-1 md:mb-10">
           <Link href="/" className="transition-opacity hover:opacity-80">
             <Image
-              src="/logo_favicon/Logo_green.svg"
+              src="/logo_favicon/Logo_v2_green.svg"
               alt="모두의식물"
               width={117}
               height={26}

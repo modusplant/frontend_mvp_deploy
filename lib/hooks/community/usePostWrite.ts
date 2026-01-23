@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { postApi } from "@/lib/api/post";
+import { postApi } from "@/lib/api/client/post";
 import { PostWritePayload } from "@/lib/types/post";
+import { showModal } from "@/lib/store/modalStore";
 
 /**
  * 게시글 작성/수정 커스텀 훅
@@ -17,12 +18,18 @@ export default function usePostWrite(postId?: string) {
   const createMutation = useMutation({
     mutationFn: (payload: PostWritePayload) => postApi.createPost(payload),
     onSuccess: () => {
-      window.alert("게시글이 등록되었습니다.");
+      showModal({
+        type: "snackbar",
+        description: "게시글이 등록되었습니다.",
+      });
       router.push("/"); // 메인페이지로 이동
     },
     onError: (error: Error) => {
       console.error("게시글 작성 실패:", error);
-      window.alert("게시글 등록에 실패했습니다. 다시 시도해주세요.");
+      showModal({
+        type: "snackbar",
+        description: error.message,
+      });
     },
   });
 
@@ -31,12 +38,18 @@ export default function usePostWrite(postId?: string) {
     mutationFn: (payload: PostWritePayload) =>
       postApi.updatePost(postId!, payload),
     onSuccess: () => {
-      window.alert("게시글이 수정되었습니다.");
+      showModal({
+        type: "snackbar",
+        description: "게시글이 수정되었습니다.",
+      });
       router.push(`/community/${postId}`); // 상세 페이지로 이동
     },
     onError: (error: Error) => {
       console.error("게시글 수정 실패:", error);
-      window.alert("게시글 수정에 실패했습니다. 다시 시도해주세요.");
+      showModal({
+        type: "snackbar",
+        description: error.message,
+      });
     },
   });
 

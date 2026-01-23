@@ -1,65 +1,42 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
-import { authApi } from "@/lib/api/auth";
-import { LoginFormValues } from "@/lib/utils/auth";
+import { authApi } from "@/lib/api/client/auth";
+import { LoginFormValues } from "@/lib/constants/schema";
+import { processSuccessfulAuth } from "@/lib/utils/auth/processSuccessfulAuth";
 
 /**
  * 로그인 커스텀 훅
  */
 export function useLogin() {
   const router = useRouter();
-  const { login, incrementLoginAttempts, setAccessToken } = useAuthStore();
+  const { login, incrementLoginAttempts } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (data: LoginFormValues) => {
-    // 임시 로그인 데이터
-    // TODO: 추후 삭제
-    if (data.email === "test1234@naver.com" && data.password === "test1234") {
-      const testUser = {
-        uuid: "test-uuid-123",
-        id: "test@test.com",
-        email: "test@test.com",
-        nickname: "test_user",
-        roles: "ROLE_USER",
-      };
-
-      login(testUser, data.rememberMe || false);
-      setAccessToken("test-access-token");
-
-      if (data.rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-      } else {
-        localStorage.removeItem("rememberMe");
-      }
-      router.back();
-      return;
-    }
-
     try {
       setIsLoading(true);
       setServerError(null);
 
-      // API 호출
+      //1. API 호출
       const response = await authApi.login({
         email: data.email,
         password: data.password,
       });
 
-      if (
-        response.status === 200 &&
-        response.user &&
-        response.data?.accessToken
-      ) {
-        // AccessToken 저장 (메모리)
-        setAccessToken(response.data.accessToken);
+      if (response.status === 200 && response.data?.accessToken) {
+        //2-6. 인증 성공 처리 (토큰 저장, 사용자 정보 조회 등)
+        const user = await processSuccessfulAuth(
+          response.data.accessToken,
+          data.rememberMe ?? false
+        );
 
-        // 로그인 성공 - JWT에서 추출한 사용자 정보 저장
-        login(response.user, data.rememberMe || false);
+        // 로그인 성공 - 사용자 정보 저장
+        login(user);
 
         console.log("로그인 성공");
-        router.back();
+        router.push("/");
       }
     } catch (error: any) {
       // 로그인 시도 횟수 증가

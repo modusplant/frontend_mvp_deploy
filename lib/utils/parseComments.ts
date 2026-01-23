@@ -7,29 +7,29 @@ import { Comment } from "@/lib/types/comment";
  *
  * @example
  * // API 응답: [
- * //   { path: "0", content: "첫 댓글", ... },
- * //   { path: "0.1", content: "첫 댓글의 답글", ... },
- * //   { path: "0.1.2", content: "답글의 답글", ... },
- * //   { path: "1", content: "두 번째 댓글", ... }
+ * //   { path: "1", content: "첫 댓글", ... },
+ * //   { path: "1.1", content: "첫 댓글의 답글", ... },
+ * //   { path: "1.1.1", content: "답글의 답글", ... },
+ * //   { path: "2", content: "두 번째 댓글", ... }
  * // ]
  * //
  * // 결과: [
  * //   {
- * //     path: "0",
+ * //     path: "1",
  * //     content: "첫 댓글",
  * //     depth: 0,
  * //     children: [
  * //       {
- * //         path: "0.1",
+ * //         path: "1.1",
  * //         content: "첫 댓글의 답글",
  * //         depth: 1,
  * //         children: [
- * //           { path: "0.1.2", content: "답글의 답글", depth: 2, children: [] }
+ * //           { path: "1.1.1", content: "답글의 답글", depth: 2, children: [] }
  * //         ]
  * //       }
  * //     ]
  * //   },
- * //   { path: "1", content: "두 번째 댓글", depth: 0, children: [] }
+ * //   { path: "2", content: "두 번째 댓글", depth: 0, children: [] }
  * // ]
  */
 export function buildCommentTree(flatComments: Comment[]): Comment[] {
@@ -74,22 +74,22 @@ export function buildCommentTree(flatComments: Comment[]): Comment[] {
  * @returns 새 댓글의 path
  *
  * @example
- * generateCommentPath(null, 0) // "0" (첫 번째 최상위 댓글)
- * generateCommentPath(null, 2) // "2" (세 번째 최상위 댓글)
- * generateCommentPath("0", 0) // "0.0" (0번 댓글의 첫 답글)
- * generateCommentPath("0.1", 2) // "0.1.2" (0.1번 댓글의 세 번째 답글)
+ * generateCommentPath(null, 0) // "1" (첫 번째 최상위 댓글)
+ * generateCommentPath(null, 2) // "3" (세 번째 최상위 댓글)
+ * generateCommentPath("1", 0) // "1.1" (1번 댓글의 첫 답글)
+ * generateCommentPath("1.1", 2) // "1.1.3" (1.1번 댓글의 세 번째 답글)
  */
 export function generateCommentPath(
   parentPath: string | null,
   siblingCount: number
 ): string {
   if (!parentPath) {
-    // 최상위 댓글
-    return siblingCount.toString();
+    // 최상위 댓글 (1부터 시작)
+    return (siblingCount + 1).toString();
   }
 
-  // 답글
-  return `${parentPath}.${siblingCount}`;
+  // 답글 (1부터 시작)
+  return `${parentPath}.${siblingCount + 1}`;
 }
 
 /**
@@ -98,9 +98,9 @@ export function generateCommentPath(
  * @returns 최상위 댓글 path
  *
  * @example
- * getRootPath("0") // "0"
- * getRootPath("0.1") // "0"
- * getRootPath("0.1.2") // "0"
+ * getRootPath("1") // "1"
+ * getRootPath("1.1") // "1"
+ * getRootPath("1.1.1") // "1"
  * getRootPath("3") // "3"
  */
 export function getRootPath(path: string): string {
@@ -113,9 +113,9 @@ export function getRootPath(path: string): string {
  * @returns depth (0부터 시작)
  *
  * @example
- * getCommentDepth("0") // 0
- * getCommentDepth("0.1") // 1
- * getCommentDepth("0.1.2") // 2
+ * getCommentDepth("1") // 0
+ * getCommentDepth("1.1") // 1
+ * getCommentDepth("1.1.1") // 2
  */
 export function getCommentDepth(path: string): number {
   return path.split(".").length - 1;
