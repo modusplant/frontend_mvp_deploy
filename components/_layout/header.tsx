@@ -6,25 +6,26 @@ import { Button } from "@/components/_common/button";
 import { cn } from "@/lib/utils/tailwindHelper";
 import { useAuthStore } from "@/lib/store/authStore";
 import { usePathname } from "next/navigation";
-import Profile from "@/components/_common/profile";
+import Profile from "@/components/_common/profileImage";
+import { User } from "@/lib/types/auth";
 
 export interface HeaderProps {
   className?: string;
+  initialUser: User | null;
 }
 
-export default function Header({ className }: HeaderProps) {
-  const { isAuthenticated, user, logout } = useAuthStore();
+export default function Header({ className, initialUser }: HeaderProps) {
+  const { isAuthenticated, user: storeUser } = useAuthStore();
   const pathname = usePathname();
-
   const isRootPath = pathname.endsWith("/");
 
-  const logo = isRootPath
-    ? "/logo_favicon/Logo_white.svg"
-    : "/logo_favicon/Logo_green.svg";
+  // Use store user if authenticated, otherwise use initialUser
+  const user = isAuthenticated ? storeUser : initialUser;
 
-  const handleLogout = () => {
-    logout();
-  };
+  const logo = isRootPath
+    ? "/logo_favicon/Logo_v2_white.svg"
+    : "/logo_favicon/Logo_v2_black.svg";
+
   return (
     <header
       className={cn(isRootPath ? "sticky top-0" : "", "z-50 w-full", className)}
@@ -41,27 +42,21 @@ export default function Header({ className }: HeaderProps) {
         </Link>
 
         {/* 로그인 상태에 따른 버튼 */}
-        <div className="flex items-center gap-2">
-          {isAuthenticated ? (
+        <div className="flex items-center gap-2 text-[13px] font-medium">
+          {user ? (
             <>
               {/* 프로필 아이콘 (추후 드롭다운 추가) */}
-              <Profile />
+              <Link href="/mypage">
+                <div className="relative h-9 w-9">
+                  <Profile imageSrc={user?.image} />
+                </div>
+              </Link>
               {/* 글쓰기 버튼 */}
               <Link href="/community/write">
-                <Button variant="point" size="sm" className="h-10 rounded-2xl">
+                <Button variant="point" size="sm" className="h-9 rounded-full">
                   글쓰기
                 </Button>
               </Link>
-              {/* 로그아웃 버튼 */}
-              {/* TODO: 추후 삭제 */}
-              <Button
-                variant="default"
-                size="sm"
-                className="rounded-full"
-                onClick={handleLogout}
-              >
-                로그아웃
-              </Button>
             </>
           ) : (
             <>
@@ -70,7 +65,7 @@ export default function Header({ className }: HeaderProps) {
                 <Button
                   variant="default"
                   size="sm"
-                  className="cursor-pointer rounded-full"
+                  className="h-9 cursor-pointer rounded-full border-none"
                 >
                   로그인
                 </Button>
@@ -79,7 +74,7 @@ export default function Header({ className }: HeaderProps) {
                 <Button
                   variant="point"
                   size="sm"
-                  className="cursor-pointer rounded-full"
+                  className="h-9 cursor-pointer rounded-full border-none"
                 >
                   회원가입
                 </Button>

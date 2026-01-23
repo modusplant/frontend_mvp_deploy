@@ -3,12 +3,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-
-import { signupSchema, SignupFormValues } from "@/lib/utils/auth";
-import { authApi } from "@/lib/api/auth";
+import { showModal } from "@/lib/store/modalStore";
+import { signupSchema, SignupFormValues } from "@/lib/constants/schema";
+import { authApi } from "@/lib/api/client/auth";
 import { useAuthStore } from "@/lib/store/authStore";
 import { TERMS_VERSIONS } from "@/lib/constants/terms";
 import { Button } from "@/components/_common/button";
+import { processSuccessfulAuth } from "@/lib/utils/auth/processSuccessfulAuth";
 
 // Sub-components
 import EmailSection from "./emailSection";
@@ -54,21 +55,40 @@ export default function SignupForm() {
           password: data.password,
         });
 
-        if (loginResult.status === 200 && loginResult.user) {
-          // 3. JWT에서 추출한 사용자 정보로 로그인 처리
-          login(loginResult.user, true); // rememberMe: true로 자동 로그인 활성화
+        if (loginResult.status === 200 && loginResult.data?.accessToken) {
+          // 3-6. 인증 성공 처리 (토큰 저장, 사용자 정보 조회 등)
+          const user = await processSuccessfulAuth(
+            loginResult.data.accessToken,
+            true // 회원가입 시 rememberMe 무조건 true
+          );
 
-          alert("회원가입이 완료되었습니다!");
+          // 로그인 성공 - 사용자 정보 저장
+          login(user);
+
+          showModal({
+            type: "snackbar",
+            description: "회원가입이 완료되었습니다!",
+          });
           router.push("/"); // 메인 페이지로 이동
         } else {
           // 로그인 실패 시 로그인 페이지로 이동
-          alert("회원가입은 완료되었습니다. 로그인해주세요.");
-          router.push("/login");
+          showModal({
+            type: "one-button",
+            title: "회원가입이 완료되었습니다!",
+            description: "로그인을 진행해주세요.",
+            buttonText: "로그인",
+            onConfirm: () => {
+              router.push("/login");
+            },
+          });
         }
       }
     } catch (error: any) {
       console.error("회원가입 오류:", error);
-      alert(error.message || "회원가입 중 오류가 발생했습니다.");
+      showModal({
+        type: "snackbar",
+        description: error.message || "회원가입 중 오류가 발생했습니다.",
+      });
     }
   };
 
@@ -112,7 +132,8 @@ export default function SignupForm() {
       <Button
         type="submit"
         disabled={!isFormValid || isSubmitting}
-        className="w-full py-3 md:py-4"
+        className="w-full rounded-lg py-3 md:py-4"
+        variant={isFormValid || !isSubmitting ? "point" : "secondary"}
       >
         {isSubmitting ? "처리 중..." : "회원가입"}
       </Button>

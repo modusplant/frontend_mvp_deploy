@@ -25,7 +25,7 @@ export default function BlurOverlay({
   return (
     <div className={cn("absolute inset-0 z-10 min-h-[30vh]", className)}>
       {/* 배경 블러 + 반투명 화이트 */}
-      <div className="h-full w-full bg-white/80 py-32 backdrop-blur-sm">
+      <div className="h-full w-full bg-white/40 py-32 backdrop-blur-xs">
         {/* 중앙 정렬 컨테이너 */}
         <div
           className={cn(

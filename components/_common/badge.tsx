@@ -26,7 +26,7 @@ export default function Badge({
     <span
       className={cn(
         // 기본 스타일
-        "inline-flex items-center rounded-lg font-medium transition-colors",
+        "inline-flex h-6 items-center rounded-[5px] font-medium transition-colors",
 
         // Variant 스타일
         {

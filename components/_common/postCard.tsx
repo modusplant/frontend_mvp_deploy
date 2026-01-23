@@ -40,19 +40,19 @@ export default function PostCard({ post, className }: PostCardProps) {
           src={thumbnail}
           alt={post.title}
           fill
-          className="rounded-xl object-cover"
+          className="rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
 
       {/* 콘텐츠 영역 */}
-      <div className="mt-5 flex flex-col gap-3.5">
+      <div className="mt-4 flex flex-col gap-4 px-2.5">
         {/* 2차 카테고리 배지 */}
         <div>
           <Badge
             variant="outline"
             size="md"
-            className="bg-surface-98 font-medium"
+            className="bg-surface-98 h-6 border-none font-medium"
           >
             {secondaryCategoryLabels[post.secondaryCategory] ||
               post.secondaryCategory}
@@ -61,7 +61,7 @@ export default function PostCard({ post, className }: PostCardProps) {
 
         <div className="flex flex-col gap-1.5">
           {/* 제목 */}
-          <h3 className="text-neutral-20 group-hover:text-primary-50 line-clamp-1 text-lg font-semibold md:text-[17px]">
+          <h3 className="text-neutral-20 line-clamp-1 text-lg font-semibold md:text-[17px]">
             {post.title}
           </h3>
 
@@ -78,6 +78,7 @@ export default function PostCard({ post, className }: PostCardProps) {
           <div className="flex items-center gap-2">
             {/* 작성자 / 통계 (좋아요, 댓글) / 날짜 */}
             <span className="text-neutral-60 max-w-20">{post.nickname}</span>
+            <span> | </span>
             <span className="flex items-center gap-1">
               <Heart
                 className="md:h-4 md:w-4"

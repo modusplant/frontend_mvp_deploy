@@ -55,7 +55,7 @@ export default function ProfileSection() {
     <div className="flex flex-col gap-6">
       {/* 프로필 정보 카드 */}
       <div className="border-surface-98 flex flex-col gap-[30px] rounded-xl border bg-white p-10">
-        <h2 className="text-neutral-5 text-[17px] leading-[1.2] font-semibold tracking-[-0.01em]">
+        <h2 className="text-neutral-5 text-[18px] leading-[1.2] font-semibold tracking-[-0.01em]">
           프로필 정보
         </h2>
 
@@ -84,7 +84,7 @@ export default function ProfileSection() {
           size="md"
           onClick={handleSave}
           disabled={!hasChanges || isPending}
-          className="rounded-full"
+          className="h-[50px] rounded-full px-5 text-[15px] font-medium"
         >
           {isPending ? "저장 중..." : "변경사항 저장"}
         </Button>

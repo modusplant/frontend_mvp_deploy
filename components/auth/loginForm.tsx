@@ -7,7 +7,7 @@ import { Input } from "@/components/_common/input";
 import { Checkbox } from "@/components/_common/checkbox";
 import { Button } from "@/components/_common/button";
 import { useAuthStore } from "@/lib/store/authStore";
-import { loginSchema, LoginFormValues } from "@/lib/utils/auth";
+import { loginSchema, LoginFormValues } from "@/lib/constants/schema";
 import { useLogin } from "@/lib/hooks/auth/useLogin";
 
 interface LoginFormProps {

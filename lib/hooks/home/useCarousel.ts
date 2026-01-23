@@ -14,7 +14,8 @@ export interface UseCarouselReturn {
   totalSlides: number;
   handleNext: () => void;
   handlePrev: () => void;
-  togglePlayPause: () => void;
+  handlePlay: () => void;
+  handlePause: () => void;
   getDisplayIndex: () => number;
 }
 
@@ -54,8 +55,12 @@ export function useCarousel(
   }, [isTransitioning]);
 
   // 재생/일시정지 토글
-  const togglePlayPause = useCallback(() => {
-    setIsPlaying((prev) => !prev);
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true);
+  }, []);
+
+  const handlePause = useCallback(() => {
+    setIsPlaying(false);
   }, []);
 
   // 현재 표시할 인덱스 계산 (복제 이미지 고려)
@@ -101,7 +106,8 @@ export function useCarousel(
     totalSlides,
     handleNext,
     handlePrev,
-    togglePlayPause,
+    handlePlay,
+    handlePause,
     getDisplayIndex,
   };
 }
