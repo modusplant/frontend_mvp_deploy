@@ -37,7 +37,7 @@ export default function PrimaryCategoryFilter({
   };
 
   const isSelector = variant === "selector";
-  const selectedCategory = categories.find((c) => c.id == selectedCategoryId);
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const displayText = selectedCategory?.name ?? "주제를 선택해주세요(필수)";
 
   return (

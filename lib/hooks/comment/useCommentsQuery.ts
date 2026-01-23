@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { commentApi } from "@/lib/api/client/comment";
+import { commentApi } from "@/lib/api/comment";
 import { Comment } from "@/lib/types/comment";
 
 interface UseCommentsQueryProps {

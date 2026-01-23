@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PostDetail from "@/components/community/detail/postDetail";
-import { postApi } from "@/lib/api/client/post";
+import { postApi } from "@/lib/api/post";
+import { dummyPostDetail } from "@/lib/data/postDetail";
 
 interface PostPageProps {
   params: {
@@ -15,9 +16,9 @@ interface PostPageProps {
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const { id } = await params;
   try {
-    const response = await postApi.getPostDetail(id);
+    const response = await postApi.getPostDetail(params.id);
+
     if (!response.data) {
       return {
         title: "게시글을 찾을 수 없습니다 | 모두의식물",
@@ -43,9 +44,23 @@ export async function generateMetadata({
  * 게시글 상세 페이지
  */
 export default async function PostPage({ params }: PostPageProps) {
-  const { id } = await params;
   try {
-    return <PostDetail postId={id} />;
+    // 실제 API 호출
+    // const response = await postApi.getPostDetail(params.id);
+
+    // if (!response.data) {
+    //   notFound();
+    // }
+
+    // 더미 데이터 사용
+    const response = { data: dummyPostDetail };
+
+    // 조회수 증가 (비동기, 에러 무시)
+    postApi.incrementViewCount(params.id).catch(() => {
+      // 조회수 증가 실패는 무시
+    });
+
+    return <PostDetail postId={params.id} initialData={response.data} />;
   } catch (error) {
     notFound();
   }

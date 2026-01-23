@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/tailwindHelper";
 import { Input } from "@/components/_common/input";
 import { PasswordSectionProps } from "@/lib/types/auth";
-import { validatePassword } from "@/lib/utils/auth/validatePassword";
+import { validatePassword } from "@/lib/utils/auth";
 
 export default function PasswordSection({
   register,

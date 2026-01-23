@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { postApi } from "@/lib/api/client/post";
+import { postApi } from "@/lib/api/post";
 import { useAuthStore } from "@/lib/store/authStore";
-import { showModal } from "@/lib/store/modalStore";
-import { set } from "zod";
 
 interface UsePostInteractionProps {
   postId: string;
-  initialLikeCount?: number;
+  initialLikeCount: number;
+  initialBookmarkCount: number;
   initialIsLiked?: boolean;
   initialIsBookmarked?: boolean;
 }
@@ -20,6 +19,7 @@ interface UsePostInteractionReturn {
   handleLike: () => void;
 
   // 북마크 상태
+  bookmarkCount: number;
   isBookmarked: boolean;
   isBookmarking: boolean;
   handleBookmark: () => void;
@@ -27,7 +27,8 @@ interface UsePostInteractionReturn {
 
 export function usePostInteraction({
   postId,
-  initialLikeCount = 0,
+  initialLikeCount,
+  initialBookmarkCount,
   initialIsLiked = false,
   initialIsBookmarked = false,
 }: UsePostInteractionProps): UsePostInteractionReturn {
@@ -38,19 +39,8 @@ export function usePostInteraction({
   const [isLiked, setIsLiked] = useState(initialIsLiked);
 
   // 북마크 상태
+  const [bookmarkCount, setBookmarkCount] = useState(initialBookmarkCount);
   const [isBookmarked, setIsBookmarked] = useState(initialIsBookmarked);
-
-  useEffect(() => {
-    setLikeCount(initialLikeCount);
-  }, [initialLikeCount]);
-
-  useEffect(() => {
-    setIsLiked(initialIsLiked);
-  }, [initialIsLiked]);
-
-  useEffect(() => {
-    setIsBookmarked(initialIsBookmarked);
-  }, [initialIsBookmarked]);
 
   // 좋아요 mutation
   const likeMutation = useMutation({
@@ -75,10 +65,7 @@ export function usePostInteraction({
       setLikeCount((prev) => prev + (currentIsLiked ? 1 : -1));
       setIsLiked(currentIsLiked);
       console.error("좋아요 처리 실패:", error);
-      showModal({
-        type: "snackbar",
-        description: error.message,
-      });
+      window.alert(error.message || "좋아요 처리에 실패했습니다.");
     },
   });
 
@@ -97,16 +84,15 @@ export function usePostInteraction({
     },
     onMutate: async (currentIsBookmarked) => {
       // 낙관적 업데이트
+      setBookmarkCount((prev) => prev + (currentIsBookmarked ? -1 : 1));
       setIsBookmarked(!currentIsBookmarked);
     },
     onError: (error: Error, currentIsBookmarked) => {
       // 에러 시 롤백
+      setBookmarkCount((prev) => prev + (currentIsBookmarked ? 1 : -1));
       setIsBookmarked(currentIsBookmarked);
       console.error("북마크 처리 실패:", error);
-      showModal({
-        type: "snackbar",
-        description: error.message,
-      });
+      window.alert(error.message || "북마크 처리에 실패했습니다.");
     },
   });
 
@@ -115,6 +101,7 @@ export function usePostInteraction({
     isLiked,
     isLiking: likeMutation.isPending,
     handleLike: () => likeMutation.mutate(isLiked),
+    bookmarkCount,
     isBookmarked,
     isBookmarking: bookmarkMutation.isPending,
     handleBookmark: () => bookmarkMutation.mutate(isBookmarked),

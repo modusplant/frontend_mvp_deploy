@@ -7,29 +7,21 @@ import {
 /**
  * 카테고리 ID로 이름 조회
  */
-export function getCategoryNameById(
-  categoryId: string,
-  primaryCategoryId?: string
-): string {
+export function getCategoryNameById(categoryId: string): string {
   // "전체" 처리
   if (categoryId === "all") {
     return "전체";
   }
 
   // 1차 카테고리에서 검색
-  if (!primaryCategoryId) {
-    const primaryCategory = PRIMARY_CATEGORIES.find((c) => c.id == categoryId);
-    if (primaryCategory) {
-      return primaryCategory.name;
-    }
+  const primaryCategory = PRIMARY_CATEGORIES.find((c) => c.id === categoryId);
+  if (primaryCategory) {
+    return primaryCategory.name;
   }
+
   // 2차 카테고리에서 검색
-  if (primaryCategoryId) {
-    const primaryCategoryName = getCategoryNameById(primaryCategoryId);
-    const secondaryCategories = SECONDARY_CATEGORIES[primaryCategoryName] || [];
-    const secondaryCategory = secondaryCategories.find(
-      (c) => c.id == categoryId
-    );
+  for (const categories of Object.values(SECONDARY_CATEGORIES)) {
+    const secondaryCategory = categories.find((c) => c.id === categoryId);
     if (secondaryCategory) {
       return secondaryCategory.name;
     }
