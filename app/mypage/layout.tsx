@@ -8,7 +8,7 @@ interface MypageLayoutProps {
 export default function MypageLayout({ children }: MypageLayoutProps) {
   return (
     <div className="bg-surface-98 min-h-screen">
-      <div className="mx-auto flex w-full max-w-[1320px] gap-10 px-5 py-[30px]">
+      <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-0 px-5 py-[30px] lg:flex-row lg:gap-10">
         {/* 사이드바 */}
         <Sidebar />
 

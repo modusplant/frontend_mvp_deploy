@@ -10,25 +10,20 @@ export default function Footer({ className }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer
-      className={cn(
-        "border-surface-stroke bg-surface-99 w-full border-t",
-        className
-      )}
-    >
+    <footer className={cn("bg-surface-99 w-full", className)}>
       <div className="mx-auto w-full max-w-[68vw] px-4 py-8 md:px-6 md:py-12 lg:px-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between lg:gap-0">
           <Image
-            src="/logo_favicon/Logo_green.svg"
+            src="/logo_favicon/Logo_v2_black.svg"
             alt="모두의식물 로고"
             width={120}
             height={32}
           />
 
-          <span className="text-surface-stroke-2">|</span>
+          <span className="text-surface-stroke-2 hidden lg:inline">|</span>
 
           {/* 링크 섹션 1 */}
-          <div className="text-neutral-40 flex gap-10">
+          <div className="text-neutral-40 flex flex-wrap justify-center gap-4 text-sm md:gap-6 lg:gap-10 lg:text-base">
             <Link href="/" className="hover:text-primary-50 transition-colors">
               사이트 소개
             </Link>
@@ -46,7 +41,7 @@ export default function Footer({ className }: FooterProps) {
             </Link>
           </div>
 
-          <span className="text-surface-stroke-2">|</span>
+          <span className="text-surface-stroke-2 hidden lg:inline">|</span>
 
           {/* 하단 저작권 */}
           <div className="text-neutral-60 text-xs md:text-sm">

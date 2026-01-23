@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   SECONDARY_CATEGORIES,
   type Category,
@@ -18,6 +18,7 @@ export interface SecondaryCategoryFilterProps {
   multiSelect?: boolean;
   showAll?: boolean;
   className?: string;
+  disableAutoReset?: boolean;
 }
 
 /**
@@ -33,9 +34,19 @@ export default function SecondaryCategoryFilter({
   multiSelect = true,
   showAll = true,
   className,
+  disableAutoReset = false,
 }: SecondaryCategoryFilterProps) {
   const { isOpen, dropdownRef, toggle, close } = useDropdownState();
   const isSelector = variant === "selector";
+
+  // variant="filter"일 때만 내부 상태로 임시 선택 관리
+  const [tempSelectedIds, setTempSelectedIds] =
+    useState<string[]>(selectedCategoryIds);
+
+  // 외부 selectedCategoryIds가 변경되면 내부 상태도 동기화
+  useEffect(() => {
+    setTempSelectedIds(selectedCategoryIds);
+  }, [selectedCategoryIds]);
 
   // 1차 카테고리에 따른 2차 카테고리 옵션
   const getSecondaryCategoryOptions = (): Category[] => {
@@ -52,42 +63,42 @@ export default function SecondaryCategoryFilter({
   // 카테고리 선택 (단일 또는 복수)
   const handleCategorySelect = (category: Category) => {
     if (isSelector || !multiSelect) {
-      // 단일 선택 (게시글 작성)
+      // 단일 선택 (게시글 작성) - 즉시 반영
       onCategoriesChange([category.id]);
       close();
       return;
     }
 
-    // 복수 선택 (메인페이지 필터)
+    // 복수 선택 (메인페이지 필터) - 임시 상태에만 저장
+    let newIds: string[];
+
     if (category.id === "all") {
-      onCategoriesChange(["all"]);
-      return;
-    }
-
-    if (selectedCategoryIds.includes("all")) {
-      onCategoriesChange([category.id]);
-      return;
-    }
-
-    if (selectedCategoryIds.includes(category.id)) {
-      const newIds = selectedCategoryIds.filter((id) => id !== category.id);
-      onCategoriesChange(newIds.length === 0 ? ["all"] : newIds);
+      newIds = ["all"];
+    } else if (tempSelectedIds.includes("all")) {
+      newIds = [category.id];
+    } else if (tempSelectedIds.includes(category.id)) {
+      const filtered = tempSelectedIds.filter((id) => id !== category.id);
+      newIds = filtered.length === 0 ? ["all"] : filtered;
     } else {
-      onCategoriesChange([...selectedCategoryIds, category.id]);
+      newIds = [...tempSelectedIds, category.id];
     }
+
+    setTempSelectedIds(newIds);
   };
 
-  // 초기화
+  // 초기화 - 임시 상태만 초기화
   const handleReset = () => {
-    onCategoriesChange(["all"]);
+    setTempSelectedIds(["all"]);
   };
 
   // 1차 카테고리 변경 시 2차 카테고리 자동 초기화
   useEffect(() => {
-    if (variant === "filter") {
-      onCategoriesChange(["all"]);
-    } else {
-      onCategoriesChange([]);
+    if (!disableAutoReset) {
+      if (variant === "filter") {
+        onCategoriesChange(["all"]);
+      } else {
+        onCategoriesChange([]);
+      }
     }
   }, [primaryCategoryId]);
 
@@ -96,9 +107,10 @@ export default function SecondaryCategoryFilter({
     if (isSelector) {
       const firstId = selectedCategoryIds[0];
       return firstId
-        ? getCategoryNameById(firstId)
+        ? getCategoryNameById(firstId, primaryCategoryId)
         : "세부 주제를 선택해주세요(필수)";
     }
+    // filter 모드에서는 실제 적용된 값 표시
     if (selectedCategoryIds.includes("all")) {
       return "전체";
     }
@@ -106,8 +118,9 @@ export default function SecondaryCategoryFilter({
     return `${count}개 선택됨`;
   };
 
+  // 저장 버튼 - 임시 선택 값을 부모에 전달하고 드롭다운 닫기
   const handleApplyAndClose = () => {
-    onCategoriesChange(selectedCategoryIds);
+    onCategoriesChange(tempSelectedIds);
     close();
   };
 
@@ -134,7 +147,7 @@ export default function SecondaryCategoryFilter({
             "text-neutral-0 w-40 rounded-full px-4 py-3 text-sm font-medium":
               !isSelector,
             // selector 스타일
-            "h-11 w-60 rounded-lg px-4.5 py-2.5": isSelector,
+            "h-11 w-full rounded-lg px-3 py-2.5 md:w-60 md:px-4.5": isSelector,
           }
         )}
         aria-haspopup="listbox"
@@ -167,7 +180,7 @@ export default function SecondaryCategoryFilter({
               // filter 스타일 (칩 형태)
               "mt-2 w-sm rounded-lg p-4": !isSelector,
               // selector 스타일 (리스트 형태)
-              "top-12 left-0 w-60 rounded-lg": isSelector,
+              "top-12 left-0 w-full rounded-lg md:w-60": isSelector,
             }
           )}
           role="listbox"
@@ -193,7 +206,8 @@ export default function SecondaryCategoryFilter({
             <>
               <div className="mb-4 flex flex-wrap items-center gap-1.5 md:gap-2">
                 {secondaryOptions.map((option) => {
-                  const isSelected = selectedCategoryIds.includes(option.id);
+                  // filter 모드에서는 tempSelectedIds로 선택 상태 표시
+                  const isSelected = tempSelectedIds.includes(option.id);
 
                   return (
                     <button

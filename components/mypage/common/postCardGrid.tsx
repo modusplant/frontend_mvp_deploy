@@ -4,7 +4,6 @@ import { useState, ReactNode } from "react";
 import PostCard from "@/components/_common/postCard";
 import Pagination from "./pagination";
 import { PostData } from "@/lib/types/post";
-import { dummyPosts } from "@/lib/data/posts";
 
 interface PostCardGridProps<T> {
   /**

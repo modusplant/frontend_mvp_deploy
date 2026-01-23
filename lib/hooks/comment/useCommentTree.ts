@@ -9,6 +9,7 @@ interface UseCommentTreeProps {
 interface UseCommentTreeReturn {
   commentTree: Comment[];
   totalCount: number;
+  rootCount: number; // 최상위 댓글 개수
 }
 
 export function useCommentTree({
@@ -19,9 +20,11 @@ export function useCommentTree({
   }, [comments]);
 
   const totalCount = comments.length;
+  const rootCount = commentTree.length; // 최상위 댓글 개수
 
   return {
     commentTree,
     totalCount,
+    rootCount,
   };
 }

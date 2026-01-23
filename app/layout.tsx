@@ -4,8 +4,11 @@ import type { Metadata } from "next";
 import { Nanum_Myeongjo } from "next/font/google";
 import localFont from "next/font/local";
 import AuthInitializer from "@/components/_layout/authInitializer";
+import AuthGuard from "@/components/_layout/authGuard";
 import ConditionalLayout from "@/components/_layout/conditionalLayout";
 import QueryProvider from "@/components/_layout/queryProvider";
+import ModalProvider from "@/components/_layout/modalProvider";
+import { getInitialAuthState } from "@/lib/utils/getInitialAuthState";
 import "./globals.css";
 
 // Emphasis 폰트: Nanum Myeongjo (제목, 강조)
@@ -55,23 +58,28 @@ export const metadata: Metadata = {
   title: "모두의식물",
   description: "식물에 관심 있는 사용자들을 위한 정보 제공 플랫폼",
   icons: {
-    icon: "/logo_favicon/favicon_green.svg",
+    icon: "/logo_favicon/favicon_v2_green.svg",
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialUser = await getInitialAuthState();
+
   return (
     <html lang="ko">
       <body
         className={`${pretendard.className} ${nanumMyeongjo.variable} antialiased`}
       >
         <QueryProvider>
-          <AuthInitializer />
-          <ConditionalLayout>{children}</ConditionalLayout>
+          <AuthInitializer initialUser={initialUser} />
+          <ConditionalLayout initialUser={initialUser}>
+            <AuthGuard>{children}</AuthGuard>
+          </ConditionalLayout>
+          <ModalProvider />
         </QueryProvider>
       </body>
     </html>

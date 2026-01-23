@@ -35,7 +35,7 @@ export default function PostListItem({ post }: PostListItemProps) {
       className="group flex items-center gap-6 py-0.5"
     >
       {/* 왼쪽: 콘텐츠 영역 */}
-      <div className="flex flex-1 flex-col gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
         {/* 카테고리 배지 + 제목 + 본문 영역 */}
         <div className="flex flex-col gap-2">
           {/* 2차 카테고리 배지 */}
@@ -53,13 +53,13 @@ export default function PostListItem({ post }: PostListItemProps) {
           {/* 제목 + 본문 영역 */}
           <div className="flex flex-col gap-1.5">
             {/* 제목 */}
-            <h3 className="text-neutral-20 group-hover:text-primary-50 line-clamp-1 text-[15px] leading-[1.2] font-medium tracking-[-0.01em]">
+            <h3 className="text-neutral-20 line-clamp-1 text-[15px] leading-[1.2] font-medium tracking-[-0.01em]">
               {post.title}
             </h3>
 
             {/* 본문 일부 (말줄임표, 최대 2줄) */}
             {excerpt && (
-              <p className="text-neutral-40 line-clamp-2 max-w-3xl text-sm leading-normal tracking-[-0.03em]">
+              <p className="text-neutral-40 line-clamp-2 max-w-full text-sm leading-normal tracking-[-0.03em] md:max-w-2xl lg:max-w-3xl">
                 {excerpt}
               </p>
             )}
@@ -67,14 +67,14 @@ export default function PostListItem({ post }: PostListItemProps) {
         </div>
 
         {/* 메타 정보 */}
-        <div className="text-neutral-60 flex items-center gap-2 text-xs leading-[1.2] tracking-[-0.02em]">
+        <div className="text-neutral-60 flex items-center gap-1.5 text-[11px] leading-[1.2] tracking-[-0.02em] md:gap-2 md:text-xs">
           {/* 1차 카테고리 */}
           <span>{post.primaryCategory}</span>
 
           {/* 좋아요 */}
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-0.5 md:gap-1">
             <Heart
-              className="h-4 w-4"
+              className="h-3 w-3 md:h-4 md:w-4"
               color={post.isLiked ? "red" : "currentColor"}
               fill={post.isLiked ? "red" : "none"}
             />
@@ -82,8 +82,8 @@ export default function PostListItem({ post }: PostListItemProps) {
           </span>
 
           {/* 댓글 */}
-          <span className="flex items-center gap-1">
-            <MessageSquare className="h-4 w-4" />
+          <span className="flex items-center gap-0.5 md:gap-1">
+            <MessageSquare className="h-3 w-3 md:h-4 md:w-4" />
             <span>{post.commentCount}</span>
           </span>
 
@@ -91,7 +91,7 @@ export default function PostListItem({ post }: PostListItemProps) {
           <Bookmark
             fill={post.isBookmarked ? "currentColor" : "none"}
             className={cn(
-              "h-[17px] w-[17px]",
+              "h-[15px] w-[15px] md:h-[17px] md:w-[17px]",
               post.isBookmarked ? "text-primary-50" : "text-neutral-60"
             )}
           />

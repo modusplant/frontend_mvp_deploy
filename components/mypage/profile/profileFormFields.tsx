@@ -52,20 +52,19 @@ export default function ProfileFormFields({
           </span>
         </div>
 
-        <div className="flex">
+        <div className="flex gap-2">
           <Input
             type="text"
             value={nickname}
             onChange={(e) => onNicknameChange(e.target.value)}
             placeholder="닉네임을 입력하세요"
-            className={`w-full flex-9 ${nicknameError ? "border-system-alert" : "rounded-r-none"}`}
+            className={`flex-1 ${nicknameError ? "border-system-alert" : ""}`}
           />
           <Button
             onClick={handleNicknameCheck}
             variant="point"
             size="md"
-            fullWidth={true}
-            className="flex-1 rounded-l-none"
+            className="shrink-0 rounded-lg px-4 text-[15px] font-medium whitespace-nowrap"
             disabled={!nickname.trim() || nickname === initialNickname}
           >
             중복 확인
@@ -91,7 +90,7 @@ export default function ProfileFormFields({
           onChange={(e) => onIntroductionChange(e.target.value)}
           placeholder="한 줄 소개를 입력해주세요."
           rows={1}
-          className="border-surface-stroke-2 bg-surface-99 text-neutral-20 placeholder:text-neutral-40 focus:border-primary-50 w-full resize-none rounded-[10px] border px-4 py-4 text-sm leading-[1.2] font-normal tracking-[-0.01em] transition-colors focus:outline-none"
+          className="border-surface-stroke-2 text-neutral-20 placeholder:text-neutral-40 focus:border-primary-50 min-h-[120px] w-full resize-none rounded-lg border px-4 py-4 text-sm leading-[1.2] tracking-[-0.01em] transition-colors focus:outline-none"
         />
       </div>
     </div>

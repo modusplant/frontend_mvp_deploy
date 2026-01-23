@@ -31,27 +31,34 @@ export function usePostWriteForm(initialData?: {
 
   // 기존 데이터로 폼 초기화 (수정 모드)
   useEffect(() => {
-    if (initialData) {
-      if (initialData.primaryCategoryId) {
-        setPrimaryCategoryId(initialData.primaryCategoryId);
-      }
-      if (initialData.secondaryCategoryId) {
-        setSecondaryCategoryId(initialData.secondaryCategoryId);
-      }
-      if (initialData.title) {
-        setTitle(initialData.title);
-      }
-      if (initialData.textContent) {
-        setTextContent(initialData.textContent);
-      }
+    if (initialData?.primaryCategoryId) {
+      setPrimaryCategoryId(initialData.primaryCategoryId);
     }
-  }, [initialData]);
+  }, [initialData?.primaryCategoryId]);
+
+  useEffect(() => {
+    if (initialData?.secondaryCategoryId) {
+      setSecondaryCategoryId(initialData.secondaryCategoryId);
+    }
+  }, [initialData?.secondaryCategoryId]);
+
+  useEffect(() => {
+    if (initialData?.title) {
+      setTitle(initialData.title);
+    }
+  }, [initialData?.title]);
+
+  useEffect(() => {
+    if (initialData?.textContent) {
+      setTextContent(initialData.textContent);
+    }
+  }, [initialData?.textContent]);
 
   // 폼 유효성 검증
   const isFormValid = useMemo(
     () =>
-      primaryCategoryId.trim() !== "" &&
-      secondaryCategoryId.trim() !== "" &&
+      primaryCategoryId &&
+      secondaryCategoryId &&
       title.trim() !== "" &&
       title.length <= 60 &&
       (textContent.trim() !== "" || images.length > 0),

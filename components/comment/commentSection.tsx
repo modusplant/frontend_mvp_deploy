@@ -4,7 +4,6 @@ import { useCommentTree } from "@/lib/hooks/comment/useCommentTree";
 import { useCommentsQuery } from "@/lib/hooks/comment/useCommentsQuery";
 import CommentList from "./commentList";
 import CommentInput from "./commentInput";
-import { dummyComments } from "@/lib/data/postDetail";
 import BlurOverlay from "../_layout/blurOverlay";
 import { useAuthStore } from "@/lib/store/authStore";
 
@@ -14,22 +13,17 @@ interface CommentSectionProps {
 
 export default function CommentSection({ postId }: CommentSectionProps) {
   // React Query로 댓글 조회
-  // const { comments, isLoading, refetch } = useCommentsQuery({ postId });
-
-  // 더미 데이터 사용
-  const comments = dummyComments;
-  const isLoading = false;
-  const refetch = () => {};
+  const { comments, isLoading, refetch } = useCommentsQuery({ postId });
 
   // 댓글 트리 구조 생성
-  const { commentTree, totalCount } = useCommentTree({ comments });
+  const { commentTree, totalCount, rootCount } = useCommentTree({ comments });
 
   // 인증 상태
   const { isAuthenticated } = useAuthStore();
 
   return (
     <div className="border-surface-stroke mt-16 border-t pt-12">
-      <h2 className="font-nanum text-neutral-0 mb-8 text-[34px] font-semibold">
+      <h2 className="text-neutral-20 mb-8 text-[28px] font-bold">
         댓글 {totalCount.toLocaleString()}개
       </h2>
 
@@ -37,10 +31,10 @@ export default function CommentSection({ postId }: CommentSectionProps) {
       <CommentInput
         postId={postId}
         onSuccess={refetch}
-        currentCommentCount={totalCount}
+        currentCommentCount={rootCount}
       />
 
-      <div className="relative">
+      <div className="relative min-h-[30vh] overflow-hidden">
         {/* 댓글 목록 */}
         {isLoading ? (
           <div className="text-neutral-60 py-12 text-center">
