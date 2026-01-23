@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo, useEffect, useRef } from "react";
-import PostCard from "@/components/_common/postCard";
+import { useMemo } from "react";
+import { dummyPosts } from "@/lib/data/posts";
+import PostCard from "@/components/home/postCard";
 import PrimaryCategoryFilter from "@/components/_common/primaryCategoryFilter";
 import SecondaryCategoryFilter from "@/components/_common/secondaryCategoryFilter";
 import { useAuthStore } from "@/lib/store/authStore";
 import BlurOverlay from "@/components/_layout/blurOverlay";
 import { useCategoryFilter } from "@/lib/hooks/category/useCategoryFilter";
-import { usePostsQuery } from "@/lib/hooks/home/usePostsQuery";
-import LoadingState from "./loadingState";
-import ErrorState from "./errorState";
-import HomeEmptyState from "./homeEmptyState";
 
 export default function PostList() {
   const { isAuthenticated } = useAuthStore();
@@ -23,69 +20,38 @@ export default function PostList() {
     handleSecondaryCategoriesChange,
   } = useCategoryFilter();
 
-  // 무한 스크롤을 위한 관찰 대상 ref
-  const observerTarget = useRef<HTMLDivElement>(null);
+  // 필터링된 게시물
+  const filteredPosts = useMemo(() => {
+    let result = dummyPosts;
 
-  // API 호출 (카테고리 필터링 포함)
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-    error,
-  } = usePostsQuery({
-    size: 12,
-    primaryCategoryId:
-      primaryCategory === "전체" ? undefined : primaryCategoryId,
-    secondaryCategoryId:
-      selectedSecondaryCategories.includes("전체") ||
-      selectedSecondaryCategoryIds.length === 0
-        ? undefined
-        : selectedSecondaryCategoryIds.join(","),
-  });
+    if (primaryCategory === "전체") {
+      return result;
+    } else {
+      result = result.filter(
+        (post) => post.primaryCategory === primaryCategory
+      );
+    }
 
-  // 모든 페이지의 게시글을 하나의 배열로 평탄화
-  const allPosts = useMemo(() => {
-    if (!data?.pages) return [];
-    return data.pages.flatMap((page) => page?.posts ?? []);
-  }, [data]);
+    // 2차 카테고리 필터링 (저장 버튼 클릭 후 적용된 값 사용)
+    if (!selectedSecondaryCategories.includes("전체")) {
+      result = result.filter((post) =>
+        selectedSecondaryCategories.includes(post.secondaryCategory)
+      );
+    }
+
+    return result;
+  }, [primaryCategory, selectedSecondaryCategories]);
 
   // 게스트(비로그인) 상태에서 보여줄/가릴 목록 계산
   const isGuest = !isAuthenticated;
   const visiblePosts = useMemo(
-    () => (isGuest ? allPosts.slice(0, 9) : allPosts),
-    [isGuest, allPosts]
+    () => (isGuest ? filteredPosts.slice(0, 9) : filteredPosts),
+    [isGuest, filteredPosts]
   );
   const hiddenPosts = useMemo(
-    () => (isGuest ? allPosts.slice(9) : []),
-    [isGuest, allPosts]
+    () => (isGuest ? filteredPosts.slice(9) : []),
+    [isGuest, filteredPosts]
   );
-
-  // IntersectionObserver를 사용한 무한 스크롤 트리거
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // 타겟이 보이고, 다음 페이지가 있고, 현재 로딩 중이 아닐 때
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isAuthenticated]);
 
   return (
     <section className="w-full">
@@ -114,49 +80,40 @@ export default function PostList() {
         </div>
       </div>
 
-      {/* 로딩 상태 (초기 로딩) */}
-      {isLoading && <LoadingState />}
+      {/* 게시물 목록 (모바일 1열, 태블릿 2열, PC 3열) */}
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-10">
+        {visiblePosts.map((post) => (
+          <PostCard key={post.postId} post={post} />
+        ))}
+      </div>
 
-      {/* 에러 상태 */}
-      {isError && (
-        <ErrorState
-          message={error instanceof Error ? error.message : undefined}
-        />
-      )}
-
-      {/* 게시물 목록 */}
-      {!isLoading && !isError && (
-        <>
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-10">
-            {visiblePosts.map((post) => (
+      {/* 비로그인 시 9개 이후 영역 블러 + CTA 오버레이 */}
+      {isGuest && hiddenPosts.length > 0 && (
+        <div className="relative mt-12">
+          {/* 가려질 게시물 영역 (실제 배치 유지) */}
+          <div className="pointer-events-none grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-10">
+            {hiddenPosts.map((post) => (
               <PostCard key={post.postId} post={post} />
             ))}
           </div>
 
-          {/* 비로그인 시 9개 이후 영역 블러 + CTA 오버레이 */}
-          {isGuest && hiddenPosts.length > 0 && (
-            <div className="relative mt-12">
-              {/* 가려질 게시물 영역 (실제 배치 유지) */}
-              <div className="pointer-events-none grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-10">
-                {hiddenPosts.map((post) => (
-                  <PostCard key={post.postId} post={post} />
-                ))}
-              </div>
+          {/* 블러 + 오버레이 컨텐츠 (재사용 컴포넌트) */}
+          <BlurOverlay variant="post" sticky />
+        </div>
+      )}
 
-              {/* 블러 + 오버레이 컨텐츠 (재사용 컴포넌트) */}
-              <BlurOverlay variant="post" />
-            </div>
-          )}
-
-          {/* 무한 스크롤 트리거 (로그인 상태일 때만) */}
-          {!isGuest && <div ref={observerTarget} className="h-10" />}
-
-          {/* 다음 페이지 로딩 중 */}
-          {isFetchingNextPage && <LoadingState />}
-
-          {/* 게시물이 없을 때 */}
-          {allPosts.length === 0 && <HomeEmptyState />}
-        </>
+      {/* 게시물이 없을 때 */}
+      {filteredPosts.length === 0 && (
+        <div className="flex h-48 items-center justify-center text-center md:h-64">
+          <div>
+            <p className="text-neutral-60 text-base font-medium md:text-lg">
+              게시물이 없습니다
+            </p>
+            <p className="text-neutral-90 mt-1 text-xs md:mt-2 md:text-sm">
+              다른 카테고리를 선택해보세요
+            </p>
+          </div>
+        </div>
       )}
     </section>
   );

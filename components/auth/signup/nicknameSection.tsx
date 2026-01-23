@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/tailwindHelper";
 import { useNicknameVerification } from "@/lib/hooks/auth/useNicknameVerification";
+import { authApi } from "@/lib/api/auth";
 import { Input } from "@/components/_common/input";
 import Button from "@/components/_common/button";
 import { NicknameSectionProps } from "@/lib/types/auth";
@@ -22,9 +23,9 @@ export default function NicknameSection({
     isLoading,
     checkNickname,
     resetVerification,
-  } = useNicknameVerification();
-
-  const nicknameDisabled = !watchedNickname || !!errors.nickname || isLoading;
+  } = useNicknameVerification({
+    onCheckNickname: authApi.checkNickname,
+  });
 
   // 닉네임 중복 확인 핸들러
   const handleCheckNickname = async () => {
@@ -32,6 +33,7 @@ export default function NicknameSection({
     if (!nicknameValid) return;
 
     const result = await checkNickname(watchedNickname);
+    window.alert(result.message);
   };
 
   // 닉네임 변경 핸들러
@@ -64,9 +66,9 @@ export default function NicknameSection({
         <Button
           type="button"
           onClick={handleCheckNickname}
-          disabled={nicknameDisabled}
-          className="w-full min-w-[92px] cursor-pointer rounded-lg px-5 py-3 text-sm sm:w-auto"
-          variant={nicknameDisabled ? "secondary" : "point"}
+          disabled={!watchedNickname || !!errors.nickname || isLoading}
+          className="w-full min-w-[92px] cursor-pointer px-5 py-3 text-sm sm:w-auto"
+          variant="secondary"
         >
           {isLoading ? "확인중..." : "중복확인"}
         </Button>

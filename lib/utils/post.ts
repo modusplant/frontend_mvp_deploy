@@ -8,8 +8,8 @@ import { PostData } from "@/lib/types/post";
 export function getThumbnail(post: PostData): string {
   const imageContent = post.content.find((c) => c.type === "image");
 
-  if (imageContent?.src) {
-    return imageContent.src;
+  if (imageContent?.data) {
+    return imageContent.data;
   }
 
   // postId의 마지막 문자를 사용하여 1-4 사이의 숫자로 변환
@@ -24,9 +24,9 @@ export function getThumbnail(post: PostData): string {
  * 본문 첫 텍스트 추출 헬퍼 함수
  * - content 배열에서 첫 번째 텍스트를 찾아 반환
  */
-export function getExcerpt(post: PostData): string | undefined {
+export function getExcerpt(post: PostData): string {
   const textContent = post.content.find((c) => c.type === "text");
-  if (!textContent) return undefined;
+  if (!textContent) return "";
 
   return textContent.data;
 }

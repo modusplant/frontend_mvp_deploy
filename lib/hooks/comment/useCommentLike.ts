@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { commentApi } from "@/lib/api/client/comment";
+import { commentApi } from "@/lib/api/comment";
 import { useAuthStore } from "@/lib/store/authStore";
 import { Comment } from "@/lib/types/comment";
-import { showModal } from "@/lib/store/modalStore";
 
 interface UseCommentLikeProps {
   postId: string;
@@ -77,10 +76,7 @@ export function useCommentLike({
         );
       }
       console.error("댓글 좋아요 처리 실패:", error);
-      showModal({
-        type: "snackbar",
-        description: error.message,
-      });
+      window.alert(error.message || "좋아요 처리에 실패했습니다.");
     },
     onSettled: () => {
       // 항상 최신 데이터로 리페치

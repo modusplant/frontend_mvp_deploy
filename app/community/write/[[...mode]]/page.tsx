@@ -10,7 +10,7 @@ import ContentEditor from "@/components/community/write/contentEditor";
 import PostWriteActions from "@/components/community/write/postWriteActions";
 import usePostWrite from "@/lib/hooks/community/usePostWrite";
 import { usePostWriteForm } from "@/lib/hooks/community/usePostWriteForm";
-import { postApi } from "@/lib/api/client/post";
+import { postApi } from "@/lib/api/post";
 
 export default function PostWritePage() {
   const params = useParams();
@@ -23,7 +23,7 @@ export default function PostWritePage() {
   // 수정 모드일 경우 기존 데이터 로드
   const { data: existingPost } = useQuery({
     queryKey: ["post", postId],
-    queryFn: () => postApi.getEditPostDetail(postId!),
+    queryFn: () => postApi.getPostDetail(postId!),
     enabled: isEditMode && !!postId,
   });
 
@@ -39,8 +39,9 @@ export default function PostWritePage() {
       .join("\n\n");
 
     return {
-      primaryCategoryId: post.primaryCategoryId,
-      secondaryCategoryId: post.secondaryCategoryId,
+      // TODO: API 응답에서 UUID를 가져와야 함
+      primaryCategoryId: post.primaryCategory, // API에서 ID로 제공되어야 함
+      secondaryCategoryId: post.secondaryCategory, // API에서 ID로 제공되어야 함
       title: post.title,
       textContent: textParts,
     };
@@ -94,7 +95,6 @@ export default function PostWritePage() {
           secondaryCategoryId={secondaryCategoryId}
           onPrimaryCategoryChange={setPrimaryCategoryId}
           onSecondaryCategoryChange={setSecondaryCategoryId}
-          isEditMode={hookIsEditMode}
         />
 
         {/* 제목 입력 */}

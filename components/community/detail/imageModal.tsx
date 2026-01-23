@@ -5,7 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 
 interface ImageModalProps {
-  imageData: string;
+  imageData: string; // base64 이미지 데이터
   onClose: () => void;
 }
 
@@ -50,7 +50,7 @@ export default function ImageModal({ imageData, onClose }: ImageModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <Image
-          src={imageData}
+          src={`data:image/png;base64,${imageData}`}
           alt="확대된 이미지"
           width={1920}
           height={1080}

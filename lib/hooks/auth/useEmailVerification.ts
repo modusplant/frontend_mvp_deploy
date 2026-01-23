@@ -2,19 +2,22 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { EmailVerificationState } from "@/lib/types/auth";
-import { authApi } from "@/lib/api/client/auth";
-import { showModal } from "@/lib/store/modalStore";
 
-const DEFAULT_EXPIRES_IN = 300; // 5분 = 300초
-
-interface UseEmailVerificationProps {
-  trigger?: (field: any) => Promise<boolean>;
-  watch?: (field: any) => any;
+export interface UseEmailVerificationProps {
+  /** 인증 요청 API 함수 (실제 구현 시 사용) */
+  onRequestVerification?: (
+    email: string
+  ) => Promise<{ success: boolean; expiresIn?: number }>;
+  /** 인증 코드 확인 API 함수 (실제 구현 시 사용) */
+  onVerifyCode?: (email: string, code: string) => Promise<{ success: boolean }>;
+  /** 기본 만료 시간 (초) */
+  defaultExpiresIn?: number;
 }
 
 export const useEmailVerification = ({
-  trigger,
-  watch,
+  onRequestVerification,
+  onVerifyCode,
+  defaultExpiresIn = 180,
 }: UseEmailVerificationProps = {}) => {
   const [verificationState, setVerificationState] =
     useState<EmailVerificationState>({
@@ -49,59 +52,69 @@ export const useEmailVerification = ({
   }, [verificationState.timeRemaining, verificationState.isCodeSent]);
 
   // 인증 요청
-  const requestVerification = useCallback(async (email: string) => {
-    try {
-      const response = await authApi.requestEmailVerification(email);
+  const requestVerification = useCallback(
+    async (email: string) => {
+      try {
+        let response;
 
-      if (response.success) {
-        setVerificationState({
-          isCodeSent: true,
-          isVerified: false,
-          timeRemaining: DEFAULT_EXPIRES_IN,
-          canResend: false,
-        });
-        return { success: true, message: "인증코드가 발송되었습니다." };
-      } else {
+        if (onRequestVerification) {
+          response = await onRequestVerification(email);
+        } else {
+          // 모킹 응답
+          response = { success: true, expiresIn: defaultExpiresIn };
+        }
+
+        if (response.success) {
+          setVerificationState({
+            isCodeSent: true,
+            isVerified: false,
+            timeRemaining: response.expiresIn || defaultExpiresIn,
+            canResend: false,
+          });
+          return { success: true, message: "인증코드가 발송되었습니다." };
+        } else {
+          return { success: false, message: "인증코드 발송에 실패했습니다." };
+        }
+      } catch (error) {
         return {
           success: false,
-          message: response.message || "인증코드 발송에 실패했습니다.",
+          message: "인증코드 발송에 실패했습니다. 다시 시도해주세요.",
         };
       }
-    } catch (error: any) {
-      return {
-        success: false,
-        message:
-          error.message || "인증코드 발송에 실패했습니다. 다시 시도해주세요.",
-      };
-    }
-  }, []);
+    },
+    [onRequestVerification, defaultExpiresIn]
+  );
 
   // 재요청
-  const resendVerification = useCallback(async (email: string) => {
-    try {
-      const response = await authApi.requestEmailVerification(email);
+  const resendVerification = useCallback(
+    async (email: string) => {
+      try {
+        let response;
 
-      if (response.success) {
-        setVerificationState({
-          isCodeSent: true,
-          isVerified: false,
-          timeRemaining: DEFAULT_EXPIRES_IN,
-          canResend: false,
-        });
-        return { success: true, message: "인증코드가 재발송되었습니다." };
-      } else {
-        return {
-          success: false,
-          message: response.message || "인증코드 재발송에 실패했습니다.",
-        };
+        if (onRequestVerification) {
+          response = await onRequestVerification(email);
+        } else {
+          // 모킹 응답
+          response = { success: true, expiresIn: defaultExpiresIn };
+        }
+
+        if (response.success) {
+          setVerificationState({
+            isCodeSent: true,
+            isVerified: false,
+            timeRemaining: response.expiresIn || defaultExpiresIn,
+            canResend: false,
+          });
+          return { success: true, message: "인증코드가 재발송되었습니다." };
+        } else {
+          return { success: false, message: "인증코드 재발송에 실패했습니다." };
+        }
+      } catch (error) {
+        return { success: false, message: "인증코드 재발송에 실패했습니다." };
       }
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.message || "인증코드 재발송에 실패했습니다.",
-      };
-    }
-  }, []);
+    },
+    [onRequestVerification, defaultExpiresIn]
+  );
 
   // 인증코드 확인
   const verifyCode = useCallback(
@@ -118,7 +131,14 @@ export const useEmailVerification = ({
       }
 
       try {
-        const response = await authApi.verifyEmailCode(email, code);
+        let response;
+
+        if (onVerifyCode) {
+          response = await onVerifyCode(email, code);
+        } else {
+          // 모킹 응답 (인증코드가 "123456"인 경우만 성공)
+          response = { success: code === "123456" };
+        }
 
         if (response.success) {
           setVerificationState((prev) => ({
@@ -126,24 +146,19 @@ export const useEmailVerification = ({
             isVerified: true,
             timeRemaining: 0,
           }));
-          return {
-            success: true,
-            message: response.message || "이메일 인증이 완료되었습니다.",
-          };
+          return { success: true, message: "이메일 인증이 완료되었습니다." };
         } else {
-          return {
-            success: false,
-            message: response.message || "인증코드가 일치하지 않습니다.",
-          };
+          return { success: false, message: "인증코드가 일치하지 않습니다." };
         }
-      } catch (error: any) {
-        return {
-          success: false,
-          message: error.message || "인증 확인에 실패했습니다.",
-        };
+      } catch (error) {
+        return { success: false, message: "인증 확인에 실패했습니다." };
       }
     },
-    [verificationState.isCodeSent, verificationState.timeRemaining]
+    [
+      onVerifyCode,
+      verificationState.isCodeSent,
+      verificationState.timeRemaining,
+    ]
   );
 
   // 상태 초기화
@@ -163,60 +178,6 @@ export const useEmailVerification = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   }, []);
 
-  // 인증 요청 핸들러
-  const handleRequestVerification = useCallback(
-    async (email: string) => {
-      // trigger가 제공된 경우에만 유효성 검사
-      if (trigger) {
-        const emailValid = await trigger("email");
-        if (!emailValid) return { success: false, message: "" };
-      }
-
-      const result = await requestVerification(email);
-      showModal({
-        type: "snackbar",
-        description: result.message,
-      });
-      return result;
-    },
-    [trigger, requestVerification]
-  );
-
-  // 재요청 핸들러
-  const handleResendVerification = useCallback(
-    async (email: string) => {
-      const result = await resendVerification(email);
-      showModal({
-        type: "snackbar",
-        description: result.message,
-      });
-      return result;
-    },
-    [resendVerification]
-  );
-
-  // 인증코드 확인 핸들러
-  const handleVerifyCode = useCallback(
-    async (email: string) => {
-      // trigger와 watch가 제공된 경우에만 유효성 검사
-      if (trigger && watch) {
-        const codeValid = await trigger("verificationCode");
-        if (!codeValid) return { success: false, message: "" };
-
-        const verificationCode = watch("verificationCode");
-        const result = await verifyCode(email, verificationCode);
-        showModal({
-          type: "snackbar",
-          description: result.message,
-        });
-        return result;
-      }
-
-      return { success: false, message: "폼 검증 함수가 제공되지 않았습니다." };
-    },
-    [trigger, watch, verifyCode]
-  );
-
   return {
     verificationState,
     requestVerification,
@@ -224,10 +185,6 @@ export const useEmailVerification = ({
     verifyCode,
     resetVerification,
     formatTime,
-    // 핸들러 함수들
-    handleRequestVerification,
-    handleResendVerification,
-    handleVerifyCode,
     // 편의 속성들
     isCodeSent: verificationState.isCodeSent,
     isVerified: verificationState.isVerified,

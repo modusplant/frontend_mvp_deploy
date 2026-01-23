@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { commentApi } from "@/lib/api/client/comment";
+import { commentApi } from "@/lib/api/comment";
 import { useAuthStore } from "@/lib/store/authStore";
 import { generateCommentPath } from "@/lib/utils/parseComments";
-import { showModal } from "@/lib/store/modalStore";
 
 interface UseCommentMutationsProps {
   postId: string;
@@ -46,11 +45,7 @@ export function useCommentMutations({
       content,
     }: CreateCommentParams) => {
       if (!isAuthenticated) {
-        showModal({
-          description: "로그인이 필요합니다.",
-          type: "snackbar",
-        });
-        return;
+        throw new Error("로그인이 필요합니다.");
       }
 
       if (content.trim().length === 0) {
@@ -59,7 +54,7 @@ export function useCommentMutations({
 
       const path = parentPath
         ? generateCommentPath(parentPath, siblingCount)
-        : String(currentCommentCount + 1);
+        : currentCommentCount.toString();
 
       await commentApi.createComment({
         postId,
@@ -73,10 +68,7 @@ export function useCommentMutations({
     },
     onError: (error: Error) => {
       console.error("댓글 작성 실패:", error);
-      showModal({
-        type: "snackbar",
-        description: error.message,
-      });
+      window.alert(error.message || "댓글 작성에 실패했습니다.");
     },
   });
 
@@ -95,10 +87,7 @@ export function useCommentMutations({
     onError: (error: Error) => {
       if (error.message !== "취소됨") {
         console.error("댓글 삭제 실패:", error);
-        showModal({
-          type: "snackbar",
-          description: error.message,
-        });
+        window.alert("댓글 삭제에 실패했습니다.");
       }
     },
   });

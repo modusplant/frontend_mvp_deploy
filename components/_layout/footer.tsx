@@ -19,7 +19,7 @@ export default function Footer({ className }: FooterProps) {
       <div className="mx-auto w-full max-w-[68vw] px-4 py-8 md:px-6 md:py-12 lg:px-8">
         <div className="flex items-center justify-between">
           <Image
-            src="/logo_favicon/Logo_v2_green.svg"
+            src="/logo_favicon/Logo_green.svg"
             alt="모두의식물 로고"
             width={120}
             height={32}
